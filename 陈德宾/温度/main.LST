@@ -1,0 +1,271 @@
+C51 COMPILER V9.00   MAIN                                                                  01/02/2019 22:03:38 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: H:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+*** WARNING C500 IN LINE 1 OF MAIN.C: LICENSE ERROR (R208: RENEW LICENSE ID CODE (LIC))
+
+   1          #include <reg52.h>                      // 包含头文件
+   2          #include <intrins.h>
+   3          
+   4          #define uchar unsigned char             // 以后unsigned char就可以用uchar代替
+   5          #define uint  unsigned int              // 以后unsigned int 就可以用uint 代替
+   6          
+   7          
+   8          sbit w1 = P2^4;                                 // 数码管第1位的控制引脚
+   9          sbit w2 = P2^5;                         // 数码管第2位的控制引脚
+  10          sbit w3 = P2^6;                         // 数码管第3位的控制引脚
+  11          sbit w4 = P2^7;                         // 数码管第4位的控制引脚
+  12          sbit DQ1 = P1^0;                                // 第一个DS18B20传感器的引脚定义
+  13          sbit DQ2 = P2^1;                                // 第二个DS18B20传感器的引脚定义
+  14          sbit LedLow  = P1^2;                    // 温度过低指示灯
+  15          sbit LedHig  = P1^4;                    // 温度过高指示灯
+  16          sbit Buzzer  = P2^3;                    // 蜂鸣器引脚
+  17          sbit KeySet  = P3^2;                    // 设置按键
+  18          sbit KeyDown = P3^3;                    // 减按键
+  19          sbit KeyUp   = P3^4;                    // 加按键
+  20          
+  21          sbit cs = P1^2;
+  22          sbit sck = P1^1;
+  23          sbit so = P1^0;
+  24          uchar DQ_switch = 0;                    //温度传感器选择  0：第一个  1：第二个
+  25          
+  26          /*   数码管的显示值 0   1   2   3   4    5   6   7   8   9   -   */
+  27          uchar code Array1[]={ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x40 };
+  28          
+  29          /*                 0.   1.   2.   3.  4.   5.   6.  7.   8.  9.  */
+  30          uchar code Array2[]={ 0xBf,0x86,0xdb,0xcf,0xe6,0xed,0xfd,0x87,0xff,0xef };
+  31          
+  32          uint Buff[5];                                   // 显示缓冲区
+  33          uchar ShowID=1;                         // 当前显示的是哪一个数码管
+  34          int AlarmLow=120;                               // 默认报警的温度下限值是12度
+  35          int AlarmHig=320;                               // 默认报警的温度上限值是32度
+  36          unsigned int byte,bytee,t;
+  37          /*********************************************************/
+  38          // 毫秒级的延时函数，time是要延时的毫秒数
+  39          /*********************************************************/
+  40          void DelayMs(uint time)
+  41          {
+  42   1              uint i,j;
+  43   1              for(i=0;i<time;i++)
+  44   1                      for(j=0;j<112;j++);
+  45   1      }
+  46          void Delay(unsigned int n)
+  47           {
+  48   1        unsigned int j;
+  49   1        for(j=0;j<n;j++)
+  50   1         {
+  51   2          ;
+  52   2         }
+  53   1        }
+  54          /*********************************************************/
+C51 COMPILER V9.00   MAIN                                                                  01/02/2019 22:03:38 PAGE 2   
+
+  55          // 延时15微秒
+  56          /*********************************************************/
+  57          void Delay15us(void)
+  58          {
+  59   1              _nop_();
+  60   1              _nop_();
+  61   1              _nop_();
+  62   1              _nop_();
+  63   1              _nop_();
+  64   1              _nop_();
+  65   1              _nop_();
+  66   1              _nop_();
+  67   1              _nop_();
+  68   1              _nop_();
+  69   1              _nop_();
+  70   1              _nop_();
+  71   1              _nop_();
+  72   1              _nop_();
+  73   1              _nop_();
+  74   1      }
+  75          void max6675_display(unsigned int x) 
+  76          {       
+  77   1              unsigned int temp[5]={0,0,0,0,0}; 
+  78   1              unsigned int n,m,t;
+  79   1              m=(10237.5*x/4095)-245;
+  80   1              temp[0]=m/10000; 
+  81   1              n=m-temp[0]*10000; 
+  82   1              temp[1]=n/1000; 
+  83   1              n=n-temp[1]*1000; 
+  84   1              temp[2]=n/100; 
+  85   1              n=n-temp[2]*100; 
+  86   1              temp[3]=n/10; 
+  87   1              n=n-temp[3]*10; 
+  88   1              temp[4]=n/1;
+  89   1              t=temp[4];
+  90   1      
+  91   1              Buff[0] =       Array1[temp[1]];
+  92   1              Buff[1] =       Array1[temp[2]];
+  93   1              Buff[2] =       Array1[temp[3]];
+  94   1              Buff[3] =       Array1[temp[4]];
+  95   1      }
+  96          
+  97          unsigned int read_max6675(void) 
+  98          {    
+  99   1              
+ 100   1              unsigned int i=0; 
+ 101   1              byte=0;
+ 102   1              cs= 0;                    //CS=0,P2.6输出低电平
+ 103   1              sck= 0;                    //SCK=0    
+ 104   1              Delay(10); 
+ 105   1              for(i=0;i<16;i++) 
+ 106   1               { 
+ 107   2                      byte<<=1;
+ 108   2                 Delay(10);
+ 109   2                 sck = 1;                 //SCK=1 
+ 110   2                  Delay(10);
+ 111   2                 if(so==1)
+ 112   2                      byte+=1;
+ 113   2                 
+ 114   2      //         byte|=(1<<(15-i));
+ 115   2                 sck = 0;                //SCK=0  
+ 116   2               }
+C51 COMPILER V9.00   MAIN                                                                  01/02/2019 22:03:38 PAGE 3   
+
+ 117   1              cs =1;;                    //CS=1 
+ 118   1              sck = 0;//SCK=0 
+ 119   1              bytee=byte;
+ 120   1              if(bytee&0x8000)byte=0xfe;
+ 121   1              else if(bytee&0x4)byte=0xff;
+ 122   1              else
+ 123   1               {
+ 124   2                 byte=byte&0x7ff8;
+ 125   2                 byte=byte>>3;
+ 126   2                 //byte=byte>>2;
+ 127   2                }
+ 128   1              return byte;
+ 129   1      } 
+ 130          
+ 131          
+ 132          /*********************************************************/
+ 133          // 定时器初始化
+ 134          /*********************************************************/
+ 135          void TimerInit()
+ 136          {
+ 137   1              TMOD = 0x01;                                            // 使用定时器0，工作方式1        
+ 138   1              TH0  = 248;                                             // 给定时器0的TH0装初值
+ 139   1              TL0  = 48;                                              // 给定时器0的TL0装初值
+ 140   1              ET0  = 1;                                                       // 定时器0中断使能
+ 141   1              EA   = 1;                                               // 打开总中断
+ 142   1              TR0      = 1;                                                   // 启动定时器0
+ 143   1      }
+ 144          
+ 145          /*********************************************************/
+ 146          // 显示温度值
+ 147          /*********************************************************/
+ 148          void ShowTemp(int dat)
+ 149          {
+ 150   1              if(dat<0)                                                       // 负号
+ 151   1              {
+ 152   2                      Buff[0]=Array1[10];
+ 153   2                      dat=0-dat;
+ 154   2              }
+ 155   1              else                                                            // 百位
+ 156   1              {
+ 157   2                      Buff[0]=Array1[dat/1000];
+ 158   2              }
+ 159   1              
+ 160   1              Buff[1]=Array1[dat%1000/100];           // 十位
+ 161   1              Buff[2]=Array2[dat%100/10];                     // 个位
+ 162   1              Buff[3]=Array1[dat%10];                         // 小数后一位
+ 163   1      }
+ 164          
+ 165          
+ 166          /*********************************************************/
+ 167          // 主函数
+ 168          /*********************************************************/
+ 169          void main()
+ 170          {
+ 171   1              int temp;
+ 172   1              uchar i;
+ 173   1              
+ 174   1              TimerInit();                                            // 定时器0的初始化（数码管的动态扫描）
+ 175   1              
+ 176   1              Buff[0]=Array1[0];                                      // 刚上电显示4个0
+ 177   1              Buff[1]=Array1[0];
+ 178   1              Buff[2]=Array1[0];
+C51 COMPILER V9.00   MAIN                                                                  01/02/2019 22:03:38 PAGE 4   
+
+ 179   1              Buff[3]=Array1[0];
+ 180   1              
+ 181   1      
+ 182   1      
+ 183   1              while(1)
+ 184   1              {
+ 185   2                      DelayMs(1000);
+ 186   2                      temp=read_max6675();      //读取温度
+ 187   2                      max6675_display(temp);    //显示温度值
+ 188   2      //              ShowTemp(temp*2);                                       // 显示温度值
+ 189   2                      
+ 190   2      
+ 191   2              }
+ 192   1      }
+*** WARNING C280 IN LINE 172 OF MAIN.C: 'i': unreferenced local variable
+ 193          
+ 194          /*********************************************************/
+ 195          // 定时器0服务程序
+ 196          /*********************************************************/
+ 197          void Timer0(void) interrupt 1
+ 198          {
+ 199   1              TH0  = 248;                             // 给定时器0的TH0装初值
+ 200   1              TL0  = 48;                              // 给定时器0的TL0装初值
+ 201   1      
+ 202   1              P0=0x00;                                        // 先关闭所有显示
+ 203   1              w1=1;
+ 204   1              w2=1;
+ 205   1              w3=1;
+ 206   1              w4=1;
+ 207   1      
+ 208   1              if(ShowID==1)                   // 判断是否显示第1位数码管
+ 209   1              {
+ 210   2                      w1=0;                           // 打开第1位数码管的控制开关
+ 211   2                      P0=Buff[0];                     // 第1位数码管显示内容  
+ 212   2              }
+ 213   1              
+ 214   1              if(ShowID==2)                   // 判断是否显示第2位数码管
+ 215   1              {
+ 216   2                      w2=0;                           // 打开第2位数码管的控制开关
+ 217   2                      P0=Buff[1];                     // 第2位数码管显示内容  
+ 218   2              }
+ 219   1              
+ 220   1              if(ShowID==3)                   // 判断是否显示第3位数码管
+ 221   1              {
+ 222   2                      w3=0;                           // 打开第3位数码管的控制开关
+ 223   2                      P0=Buff[2];                     // 第3位数码管显示内容  
+ 224   2              }
+ 225   1              
+ 226   1              if(ShowID==4)                   // 判断是否显示第4位数码管
+ 227   1              {
+ 228   2                      w4=0;                           // 打开第4位数码管的控制开关
+ 229   2                      P0=Buff[3];                     // 第4位数码管显示内容  
+ 230   2              }       
+ 231   1              
+ 232   1              ShowID++;                               // 切换到下一个数码管的显示
+ 233   1              if(ShowID==5)
+ 234   1                      ShowID=1;
+ 235   1      }
+ 236          
+ 237          
+
+
+C51 COMPILER V9.00   MAIN                                                                  01/02/2019 22:03:38 PAGE 5   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    722    ----
+   CONSTANT SIZE    =     31    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     22      17
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  2 WARNING(S),  0 ERROR(S)

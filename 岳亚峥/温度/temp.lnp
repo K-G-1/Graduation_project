@@ -1,0 +1,3 @@
+"main.obj" 
+TO "temp" 
+RAMSIZE(256) 
