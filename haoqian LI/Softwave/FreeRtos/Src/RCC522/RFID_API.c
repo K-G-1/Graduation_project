@@ -1,6 +1,6 @@
 #include "RFID_API.h"
 #include "stdlib.h"
-
+#include "oled.h"
 uint8_t CardID[4];   //´æ·ÅM¿¨Àà±ð
 uint8_t study_num[10]={":15082114"};   //Ñ§ºÅ
 uint8_t name[6] = "¹ËÒã  ";
@@ -9,9 +9,10 @@ uint8_t key_func =3;			//3,ÎÞ²Ù×÷  £»0£¬ÔËÐÐ¿ØÖÆ¹¦ÄÜ£»   1  ÔËÐÐ¶Á¿¨ÐÅÏ¢    £»2Ì
 uint8_t  DefaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; 					//RFIDµÄ¶ÁÈ¡Êý¾ÝµÄÃÜÂë
 
 uint8_t ic_card_key[4]={6,6,6,6};
+
 uint8_t door_key[6] = {6,6,4,7,4,8};																			//×Ô¶¨ÒåµÄÃÜÂë  ÓÃÓÚ¿ªÃÅ
 uint8_t door_key1[6] = "123456";
-
+uint8_t default_card_key[4]={1,2,3,4};
 unsigned char RC522_Wbuff[16];
 unsigned char RC522_Rbuff[16];
 
@@ -167,30 +168,25 @@ uint8_t RC522_Read_Mess(void)
 //}
 
 
-//uint8_t RC522_Add_ic_card(void)
-//{
-//    char status;
-//	uint8_t i = 0;
-//	
-//	uint8_t Card_Type[4];
-//	status = PcdRequest(0x52,Card_Type);			
-//	status = PcdAnticoll(CardID);/*·À³å×²*/
-//	status = PcdSelect(CardID);//Ñ¡¿¨
-//	status = PcdAuthState(PICC_AUTHENT1A,2,DefaultKey,CardID);
-//	memset(RC522_Wbuff,0,16);
-//	if(status == MI_OK)
-//	{
-//        HAL_Delay(10);
-//		status = PcdWrite(2,ic_card_key);
-//        if(status == 0)
-//        {
-//            OLED_P6x8Str(0,2,"write success");
-//        }else
-//            OLED_P6x8Str(0,2,"write faild  ");
-//	}
-//    else 
-//        OLED_P6x8Str(0,2,"no card  ");
-//    HAL_Delay(500);
+uint8_t RC522_Add_ic_card(void)
+{
+    char status;
+	uint8_t i = 0;
+	
+	uint8_t Card_Type[4];
+	status = PcdRequest(0x52,Card_Type);			
+	status = PcdAnticoll(CardID);/*·À³å×²*/
+	status = PcdSelect(CardID);//Ñ¡¿¨
+	status = PcdAuthState(PICC_AUTHENT1A,2,DefaultKey,CardID);
+	memset(RC522_Wbuff,0,16);
+	if(status == MI_OK)
+	{
+        HAL_Delay(10);
+		status = PcdWrite(2,ic_card_key);
+
+	}
+
+//  HAL_Delay(500);
 //	status = PcdAuthState(PICC_AUTHENT1A,1,DefaultKey,CardID);
 //		
 //	for(i=0;i<6;i++)          //6×Ö½Ú ÐÕÃû£¬0-5
@@ -202,8 +198,8 @@ uint8_t RC522_Read_Mess(void)
 //		RC522_Wbuff[6+i] = study_num[i];
 //	}
 //	status = PcdWrite(1,RC522_Wbuff);
-//	return status;
-//}
+	return status;
+}
 /*****************************************************
 @Version		:V1.0
 @CreatDate	:
@@ -220,46 +216,38 @@ uint16_t read_message(unsigned char * student_info)
 
 	return status;
 }
-///***************************************************
-//*@version		:V1.0
-//*@CreatDate		:2018/5/5
-//*@Description	:Ñ¡¿¨Ö®ºóÏò¿ì2Ð´Èë0000
-//*@Author		:K.G. 
-//****************************************************/
-//uint8_t RC522_del_ic_card(void)
-//{
-//    char status;
-//	uint8_t i=0;
-//	uint8_t Card_Type[4];
-//	status = PcdRequest(0x52,Card_Type);			
-//	status = PcdAnticoll(CardID);/*·À³å×²*/
-//	status = PcdSelect(CardID);//Ñ¡¿¨
-//	status = PcdAuthState(PICC_AUTHENT1A,2,DefaultKey,CardID);
-//	memset(RC522_Wbuff,0,16);
-//	if(status == MI_OK)
-//	{
-//        delay_ms(10);
-//        while(PcdWrite(2,RC522_Wbuff) !=0 && i <10)
-//        {
-//            i++;
-//        }
-//        if(i>+10)
-//        {
-//            LCD_ShowString(0,145,120,12,12,"write faild  ");
-//           return  MI_ERR;
-//        }
-//        if(status == 0)
-//        {
-//            LCD_ShowString(0,145,120,12,12,"write success");
-//        }else
-//            LCD_ShowString(0,145,120,12,12,"write faild  ");
-//	}
-//    else 
-//        LCD_ShowString(0,145,120,12,12,"no card  ");
-//    delay_ms(500);
+/***************************************************
+*@version		:V1.0
+*@CreatDate		:2018/5/5
+*@Description	:Ñ¡¿¨Ö®ºóÏò¿ì2Ð´Èë0000
+*@Author		:K.G. 
+****************************************************/
+uint8_t RC522_del_ic_card(void)
+{
+    char status;
+	uint8_t i=0;
+	uint8_t Card_Type[4];
+	status = PcdRequest(0x52,Card_Type);			
+	status = PcdAnticoll(CardID);/*·À³å×²*/
+	status = PcdSelect(CardID);//Ñ¡¿¨
+	status = PcdAuthState(PICC_AUTHENT1A,2,DefaultKey,CardID);
+	memset(RC522_Wbuff,0,16);
+	if(status == MI_OK)
+	{
+        HAL_Delay(10);
+        while(PcdWrite(2,RC522_Wbuff) !=0 && i <10)
+        {
+            i++;
+        }
+        if(i>+10)
+        {
+           return  MI_ERR;
+        }
 
-//	return status;
-//}
+	}
+
+	return status;
+}
 ///***************************************************
 //*@version		:V1.0
 //*@CreatDate		:2018/5/5

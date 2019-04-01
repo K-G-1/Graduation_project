@@ -32,3 +32,4 @@ freertos\rfid_api.o: ..\Src\RCC522\RFID_API.h
 freertos\rfid_api.o: ../Inc/spi.h
 freertos\rfid_api.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 freertos\rfid_api.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+freertos\rfid_api.o: ..\Src\oled\oled.h

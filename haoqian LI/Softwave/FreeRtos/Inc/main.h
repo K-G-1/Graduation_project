@@ -61,20 +61,36 @@
 
 #define LED0_Pin GPIO_PIN_13
 #define LED0_GPIO_Port GPIOC
-#define ULN2003_0_Pin GPIO_PIN_0
-#define ULN2003_0_GPIO_Port GPIOA
-#define ULN2003_1_Pin GPIO_PIN_1
-#define ULN2003_1_GPIO_Port GPIOA
-#define ULN2003_2_Pin GPIO_PIN_2
-#define ULN2003_2_GPIO_Port GPIOA
-#define ULN2003_3_Pin GPIO_PIN_3
-#define ULN2003_3_GPIO_Port GPIOA
+#define Key0_Pin GPIO_PIN_0
+#define Key0_GPIO_Port GPIOA
+#define Key1_Pin GPIO_PIN_1
+#define Key1_GPIO_Port GPIOA
+#define Key2_Pin GPIO_PIN_2
+#define Key2_GPIO_Port GPIOA
+#define Key3_Pin GPIO_PIN_3
+#define Key3_GPIO_Port GPIOA
+#define Key4_Pin GPIO_PIN_4
+#define Key4_GPIO_Port GPIOA
+#define Key5_Pin GPIO_PIN_5
+#define Key5_GPIO_Port GPIOA
+#define Key6_Pin GPIO_PIN_6
+#define Key6_GPIO_Port GPIOA
+#define Key7_Pin GPIO_PIN_7
+#define Key7_GPIO_Port GPIOA
 #define RC522_CS_Pin GPIO_PIN_12
 #define RC522_CS_GPIO_Port GPIOB
 #define RC522_IRQ_Pin GPIO_PIN_11
 #define RC522_IRQ_GPIO_Port GPIOA
 #define RC522_RST_Pin GPIO_PIN_12
 #define RC522_RST_GPIO_Port GPIOA
+#define ULN2003_0_Pin GPIO_PIN_4
+#define ULN2003_0_GPIO_Port GPIOB
+#define ULN2003_1_Pin GPIO_PIN_5
+#define ULN2003_1_GPIO_Port GPIOB
+#define ULN2003_2_Pin GPIO_PIN_6
+#define ULN2003_2_GPIO_Port GPIOB
+#define ULN2003_3_Pin GPIO_PIN_7
+#define ULN2003_3_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**

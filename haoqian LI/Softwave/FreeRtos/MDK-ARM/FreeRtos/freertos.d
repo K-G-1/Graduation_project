@@ -49,3 +49,4 @@ freertos\freertos.o: ../Inc/spi.h
 freertos\freertos.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 freertos\freertos.o: ..\Src\oled\oled.h
 freertos\freertos.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+freertos\freertos.o: ../Inc/i2c.h

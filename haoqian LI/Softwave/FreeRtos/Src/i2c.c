@@ -128,7 +128,15 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
   else if(i2cHandle->Instance==I2C2)
   {
   /* USER CODE BEGIN I2C2_MspInit 0 */
-
+		GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(LED0_GPIO_Port, &GPIO_InitStruct);
+		
+		HAL_GPIO_WritePin(GPIOB,GPIO_PIN_10|GPIO_PIN_11,GPIO_PIN_SET);
+		I2C2->CR1 = I2C_CR1_SWRST;
+		I2C2->CR1 = 0;
   /* USER CODE END I2C2_MspInit 0 */
   
     /**I2C2 GPIO Configuration    

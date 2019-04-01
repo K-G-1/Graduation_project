@@ -19,6 +19,7 @@ uint8_t RC522_Read_Mess(void);
 uint8_t RC522_Add_User(uint8_t num);
 uint8_t  write_DoorKey(uint8_t *key,uint8_t* name) ;
 uint8_t RC522_Add_ic_card(void);
+uint8_t RC522_del_ic_card(void);
 void add_ic(void);
 void del_ic(void);
 

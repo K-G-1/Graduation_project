@@ -21,10 +21,13 @@ void oled_dis_str(void);
 void Draw_BMP(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1,unsigned char BMP[960]);
  void Draw_line(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char *data);
 
-
+void LCD_ShowString(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint8_t size,uint8_t *p);
 
 
 void oled_show_RC522_data(unsigned char  **data);
+void oled_show_Str( uint8_t x,uint8_t y  ,unsigned char  *data,uint8_t num);
+
+
 #endif
 
 

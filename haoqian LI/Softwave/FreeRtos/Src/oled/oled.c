@@ -90,6 +90,8 @@ void OLED_Init(void)
     OLED_WrCmd(0xaf); //--turn on oled panel
 	OLED_Fill(0x00); //初始清屏
 	Draw_BMP(0,0,127,64,(unsigned char *)gImage_2);
+	HAL_Delay(1000);
+	OLED_Fill(0x00); //初始清屏
 	OLED_Set_Pos(0,0);
 } 
 
@@ -197,6 +199,27 @@ void Draw_BMP(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y
 
 }
 
+//显示字符串
+//x,y:起点坐标
+//width,height:区域大小  
+//size:字体大小
+//*p:字符串起始地址		  
+void LCD_ShowString(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint8_t size,uint8_t *p)
+{         
+		
+//	uint8_t x0=x;
+//	width+=x;
+//	height+=y;
+//    while((*p<='~')&&(*p>=' '))//判断是不是非法字符!
+//    {       
+//        if(x>=width){x=x0;y+=size;}
+//        if(y>=height)break;//退出
+//        OLED_P6x8Str(x,y,*p,size,0);
+//        x+=size/2;
+//        p++;
+//    }  
+}
+
 /**********************************************************/
 
 void oled_show_RC522_data(unsigned char  **data)
@@ -208,5 +231,22 @@ void oled_show_RC522_data(unsigned char  **data)
 //	OLED_P6x8Str(36,7,(data+3));
 	
 }
+
+
+void oled_show_Str( uint8_t x,uint8_t y  ,unsigned char  *data,uint8_t num)
+{
+		uint8_t m=0;
+	unsigned char c=0,i=0,j=0;
+	for(m = 0;m<num;m++)
+	{
+		c = *(data + m)-32;
+		
+		OLED_Set_Pos(x+ m * 6,y);
+		
+		for(i=0;i<6;i++)
+		OLED_WrDat(F6x8[c][i]);
+	}
+}
+
 
 
