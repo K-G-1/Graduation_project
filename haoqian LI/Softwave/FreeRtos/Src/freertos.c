@@ -751,7 +751,8 @@ void KeyOpen(uint8_t key_value)
 				else if(key_value == 15)                //ÐÞ¸ÄÃÜÂë
         {
 					osThreadResume(RC522_TASKHandle);
-
+					ic_card_status  = 0;
+            password_status = 0;
 					osDelay(10);
         }
         else if(num >=4)
