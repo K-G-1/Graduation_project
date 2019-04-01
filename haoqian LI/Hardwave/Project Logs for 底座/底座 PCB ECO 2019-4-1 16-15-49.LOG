@@ -1,0 +1,10 @@
+Removed Pin From Net: NetName=5V Pin=H5-5
+Removed Pin From Net: NetName=GND Pin=H5-6
+Removed Pin From Net: NetName=5V Pin=H5-7
+Removed Pin From Net: NetName=GND Pin=H5-8
+Removed Pin From Net: NetName=5V Pin=H5-9
+Removed Pin From Net: NetName=GND Pin=H5-10
+Change Component DesignItemId : Designator=H5 Old DesignItemId=Header 5X2 New DesignItemId=Header 2X2
+Change Component Footprint: Designator=H5 Old Footprint=HDR2X5 New Footprint=HDR2X2
+Change Component Comment : Designator=H5 Old Comment=Header 5X2 New Comment=Header 2X2
+Added Room: Name=µ××ù
